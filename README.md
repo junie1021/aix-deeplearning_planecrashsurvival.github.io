@@ -1,4 +1,4 @@
-[iris_150.csv](https://github.com/user-attachments/files/20745021/iris_150.csv)## aix-deeplearning_planecrashsurvival.github.io
+## aix-deeplearning_planecrashsurvival.github.io
 # Title: 비행기 사고 생존율 분석
 # Members
 문준영 정보시스템공학과 Liquidangel6922@gmail.com 
