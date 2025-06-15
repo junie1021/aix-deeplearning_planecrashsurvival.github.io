@@ -224,13 +224,13 @@ if __name__ == "__main__":
 import pandas as pd
 import numpy as np
 
-#just like simple linear regression below, but with multiple features
-
+# just like simple linear regression, but with multiple features
+# Define a class for multiple linear regression
 class MultipleLinearRegression:
     def __init__(self):
         self.weights = None
         self.bias = 0
-    
+    # Custom method to split dataset into training and test sets
     def train_test_split(self, X, y, test_size=0.2, random_state=42):
         np.random.seed(random_state)
         n_samples = len(X)
@@ -246,34 +246,36 @@ class MultipleLinearRegression:
         y_test = y[test_indices]
         
         return X_train, X_test, y_train, y_test
-    
+    # Fit the model using the normal equation
     def fit(self, X, y):
+        # Add bias column (1s) to the input features
         X_with_bias = np.hstack((np.ones((X.shape[0], 1)), X))
+        # Calcuate weights using the normal equation
         self.weights = np.linalg.inv(X_with_bias.T @ X_with_bias) @ X_with_bias.T @ y
-
+    # Predict values based on the input features
     def predict(self, X):
         # Add bias column to match training format
         X_with_bias = np.hstack((np.ones((X.shape[0], 1)), X))
         return X_with_bias @ self.weights
-    
+    # Calculate R-squared score to evaluate the model
     def score(self, X, y):
         predictions = self.predict(X)
-        ss_res = np.sum((y - predictions) ** 2)
-        ss_tot = np.sum((y - np.mean(y)) ** 2)
+        ss_res = np.sum((y - predictions) ** 2) # Sum of squared residuals
+        ss_tot = np.sum((y - np.mean(y)) ** 2)  # Total sum of sqaures
         return 1 - ss_res / ss_tot
     
 def main():
     print("Multiple Linear Regression using house price prediction")
-
+    # Load the dataset
     df = pd.read_csv("house_prices_100.csv")
-
+    # Display the first few rows of the dataset
     print(df.head())
-
+    # Select input features and target variable
     X = df[['size_sqm', 'distance_to_city_km', 'bedrooms', 'age_years']].values
     y = df['price_million_won'].values
-
+    # Create model instance
     model = MultipleLinearRegression()
-    
+    # Split data into training and test sets
     # Use train/test split for proper evaluation
     X_train, X_test, y_train, y_test = model.train_test_split(X, y)
     
@@ -589,7 +591,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score
-
+# Node class to represent each node in the decision tree
 class Node:
     def __init__(self, feature_index=None, threshold=None, left=None, right=None, *, value=None, gini=None):
         self.feature_index = feature_index
@@ -598,7 +600,7 @@ class Node:
         self.right = right
         self.value = value
         self.gini = gini
-
+# Custom decision tree classifier implementation
 class CustomDecisionTreeClassifier:
     def __init__(self, max_depth=None, min_samples_split=2):
         self.max_depth = max_depth if max_depth is not None else float('inf')
@@ -606,7 +608,7 @@ class CustomDecisionTreeClassifier:
         self.root = None
         self.feature_names_in_ = None
         self.n_features_in_ = None
-
+    # Calculate Gini impurity for a label array
     def _calculate_gini(self, y):
         if y.size == 0:
             return 0
@@ -614,7 +616,7 @@ class CustomDecisionTreeClassifier:
         probabilities = counts / y.size
         gini = 1 - np.sum(probabilities**2)
         return gini
-
+    # Find the best featureand threshold to split the dataset
     def _find_best_split(self, X, y):
         n_samples, n_features = X.shape
         if n_samples < self.min_samples_split:
@@ -655,7 +657,7 @@ class CustomDecisionTreeClassifier:
                     }
         
         return best_split_info
-
+    # Recursively buil the decision tree
     def _build_tree(self, X, y, depth):
         n_samples, _ = X.shape
         current_node_gini = self._calculate_gini(y)
@@ -689,13 +691,13 @@ class CustomDecisionTreeClassifier:
             right=right_subtree,
             gini=current_node_gini
         )
-
+    # Determine the most common label in a given array
     def _most_common_label(self, y):
         if y.size == 0:
             return None 
         unique_labels, counts = np.unique(y, return_counts=True)
         return unique_labels[np.argmax(counts)]
-
+    # Train the decision tree model
     def fit(self, X, y):
         if isinstance(X, pd.DataFrame):
             self.feature_names_in_ = X.columns.tolist()
@@ -710,7 +712,7 @@ class CustomDecisionTreeClassifier:
         
         self.n_features_in_ = X_values.shape[1]
         self.root = self._build_tree(X_values, y_values, depth=0)
-
+    # Traverse the tree for a single sample
     def _traverse_tree(self, x, node):
         if node.value is not None:
             return node.value
@@ -719,7 +721,7 @@ class CustomDecisionTreeClassifier:
             return self._traverse_tree(x, node.left)
         else:
             return self._traverse_tree(x, node.right)
-
+    # Predict classes for a dataset 
     def predict(self, X):
         if isinstance(X, pd.DataFrame):
             X_values = X.values
@@ -808,7 +810,7 @@ if __name__ == "__main__":
     main()
 ```
 #### K-최근접 이웃 (K-Nearest Neighbors, K-NN): 새로운 데이터 포인트와 가장 가까운 K개의 훈련 데이터 포인트를 기반으로 분류하는 모델입니다.
-```
+```C++
 #Build a K-NN classifier
 
 import numpy as np
@@ -823,14 +825,14 @@ class KNNClassifier:
         self.X_train = None
         self.y_train = None
 
-    def _euclidean_distance(self, point1, point2):
+    def _euclidean_distance(self, point1, point2): # Calculate distance between two vectors(point)
         return np.sqrt(np.sum((point1 - point2)**2))
 
     def fit(self, X, y):
         self.X_train = X
         self.y_train = y
 
-    def _predict_single_instance(self, x_test_instance):
+    def _predict_single_instance(self, x_test_instance): # Calculate all distances, sort them, select k smallest distances, find the 'mode'
         distances = []
         for i, train_point in enumerate(self.X_train):
             distance = self._euclidean_distance(x_test_instance, train_point)
@@ -864,64 +866,67 @@ def main():
     except FileNotFoundError:
         print(f"Error: '{csv_file_path}' file not found. Please check the file path.")
         return
-
+    # Sampling all datas in iris_daaframe(shuffling all indexes and discard original indexes)
     iris_dataframe = iris_dataframe.sample(frac=1, random_state=42).reset_index(drop=True)
-    
+    # Print head of dataframe(shuffled)
     print("--- Shuffled Dataset (first 5 samples) ---")
     print(iris_dataframe.head())
     print("-" * 70)
-
+    # Making new dataframe which includes 4 columns; lengths and widths.
     X_df = iris_dataframe[['sepal_length', 'sepal_width', 'petal_length', 'petal_width']]
     y_series = iris_dataframe['species']
-
+    # Using LabelEncoder, make 'species'series to integer series:[0,2,2,1,0,....]
     label_encoder = LabelEncoder()
     y_encoded = label_encoder.fit_transform(y_series)
-    
+    # Make dictionary between 'members of y_series' and 'integers'
     class_names_list = label_encoder.classes_.tolist() 
     label_to_species_name_map = {i: name for i, name in enumerate(class_names_list)}
-
+    # Print those mappings
     print("\n--- Target Variable Encoding ---")
     print(f"Original species names: {class_names_list}")
     print(f"Encoded labels for first 5 samples: {y_encoded[:5]}")
     print(f"Mapping: {label_to_species_name_map}")
     print("-" * 70)
-
+    # Split datas into 'for train'(80%) and 'for test'(20%), keeping ratio between each labels in splited datas
     X_train_df, X_test_df, y_train, y_test = train_test_split(X_df, y_encoded, test_size=0.2, random_state=42, stratify=y_encoded)
-
+    # Use StandardScaler to make datas 'scaled'
+    # Use fit_transform scaling X_train to 'train(fit)' mean of data
+    # Use only transform scaling X_test to keep independency of test data
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train_df)
     X_test_scaled = scaler.transform(X_test_df)
-    
+    # Print how datas are scaled
     print(f"\n--- Data Scaling Applied ---")
     print(f"Training data size after scaling: X_train {X_train_scaled.shape}, y_train {y_train.shape}")
     print(f"Test data size after scaling: X_test {X_test_scaled.shape}, y_test {y_test.shape}")
     if X_train_scaled.shape[0] > 0:
         print(f"Sample of scaled training data (first row): {X_train_scaled[0]}")
     print("-" * 70)
-
+    # Set value of K in K-NN, and use KNNClassifier class
     k_value = 5
     knn_classifier = KNNClassifier(k=k_value)
-    
+    # knn_classifier.fit -> it saves those train datas
     print(f"\n--- Training Custom K-NN Classifier (K={k_value}) ---")
     knn_classifier.fit(X_train_scaled, y_train)
     print("Training complete (data stored).")
     print("-" * 70)
-
+    # knn_classifier.predict -> it predicts labels of train sets, compares those labels and calculates accuracy.
     train_predictions = knn_classifier.predict(X_train_scaled)
     train_accuracy = accuracy_score(y_train, train_predictions)
     print(f"\n--- Training Set Performance ---")
     print(f"Accuracy: {train_accuracy:.4f}")
-    
+    # Using test data, does same thing(calculate test accuracy)
     test_predictions = knn_classifier.predict(X_test_scaled)
     test_accuracy = accuracy_score(y_test, test_predictions)
     print(f"\n--- Test Set Performance ---")
     print(f"Accuracy: {test_accuracy:.4f}")
-    
+    # Count how many right answers from test data are
+    # Count how many test data are and print as ratio
     num_correct_total = np.sum(y_test == test_predictions)
     num_total_test = len(y_test)
     print(f"Correct predictions on test set: {num_correct_total}/{num_total_test}")
     print("-" * 70)
-
+    # print detailed predicion from test data, using dicionary from y_series to show 'integer' and 'species name'
     print("\n--- Test Set Prediction Details (first 10 samples) ---")
     print(f"{'Actual Species':<20} | {'Predicted Species':<20} | {'Correct?':<10}")
     print("-" * 60)
@@ -933,7 +938,7 @@ def main():
         is_correct = "Yes" if true_label == pred_label else "No"
         print(f"{true_species_name:<20} | {pred_species_name:<20} | {is_correct:<10}")
     print("-" * 70)
-
+ 
     #print all test accuracy
     print(f"\n--- Test Set Accuracy ---")
     print(f"Accuracy: {test_accuracy:.4f} ({num_correct_total}/{num_total_test})")
