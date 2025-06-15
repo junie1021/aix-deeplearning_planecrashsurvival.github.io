@@ -2,12 +2,15 @@
 # Title: 비행기 사고 생존율 분석
 # Members
 문준영 정보시스템공학과 Liquidangel6922@gmail.com 
+
 Task: 모델구조 설계/ 코드 작성
 
 박준희 융합전자공학부 stayfun.junie@gmail.com
+
 Task: 모델에 대한 설명글 작성/ 블로그 작성 
 
 정수민 컴퓨터소프트웨어학과 min_jr13@naver.com
+
 Task: 모델에 대한 설명글 작성/ 영상촬영
 
 # Proposal
