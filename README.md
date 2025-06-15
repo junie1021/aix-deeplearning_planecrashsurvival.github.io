@@ -29,12 +29,12 @@ iris_150.csv 는 로지스틱 회귀모델(이진), 로지스틱 회귀모델(Ov
 # III. Methodology
 - 로지스틱 회귀모델(이진), 로지스틱 회귀모델(OvA), 결정트리모델, K-NN 모델, 다중선형회귀 모델, 단순선형회귀모델을 실행해보는 과정입니다.
 ### 가상 환경 생성 및 활성화
-```
+```C++
 python3 -m venv venv
 source venv/bin/activate
 ```
 ### 필요 라이브러리 설치
-```
+```C++
 requirements.txt:
 
 pandas
@@ -45,7 +45,7 @@ scikit-learn
 pip install -r requirements.txt
 ```
 ### 스크립트 실행
-```
+```C++
 python3 SimpleLinear.py
 python3 MultipleLinear.py
 python3 LogisticRegression.py
@@ -54,12 +54,12 @@ python3 DecisionTree.py
 python3 KNN_Classifier.py
 ```
 ### 가상 환경 비활성화
-```
+```C++
 deactivate
 ```
 - 각 모델에 대한 설명 및 스크립트에 대한 설명입니다.
 #### 단순 선형 회귀 (Simple Linear Regression): 하나의 독립 변수를 사용하여 종속 변수를 예측하는 모델입니다.
-```
+```C++
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -220,7 +220,7 @@ if __name__ == "__main__":
 ```
 
 #### 다중 선형 회귀 (Multiple Linear Regression): 여러 개의 독립 변수를 사용하여 종속 변수를 예측하는 모델입니다.
-```
+```C++
 import pandas as pd
 import numpy as np
 
@@ -305,24 +305,25 @@ if __name__ == "__main__":
 
 ```
 #### 로지스틱 회귀 (Binary Logistic Regression):  이진 분류 문제를 해결하기 위한 모델입니다. (예: Iris 데이터셋에서 특정 품종인지 아닌지 분류)
-```
+```C++
 # Using iris_150.csv, do logistic regression to predict the species of the iris
 
-import pandas as pd
-import numpy as np
+import pandas as pd # Import the pandas library for data maipulation
+import numpy as np  # Import the numpy library for numerical operations
 
 class LogisticRegression:
+    # Initializes the learning rate and maximum number of iterations, and sets the initial weights and bias of the model to None
     def __init__(self, learning_rate=0.01, max_iterations=1000):
         self.learning_rate = learning_rate
         self.max_iterations = max_iterations
         self.weights = None
         self.bias = None
-
+    # Sigmoid function: Used as the activation function in logistic regression
     def sigmoid(self, z):
         # Clip z to avoid overflow/underflow in exp
         z = np.clip(z, -500, 500)
         return 1 / (1 + np.exp(-z))
-    
+    # Custom fuction to split the dataset into training and testing sets
     def train_test_split(self, X, y, test_size=0.2, random_state=42):
         np.random.seed(random_state)
         indices = np.random.permutation(len(X))
@@ -336,7 +337,8 @@ class LogisticRegression:
         y_test = y[test_indices]
 
         return X_train, X_test, y_train, y_test
-    
+    # Trains the logistic regression model using the provided training data X and labels y
+    # Optimizes the weights and bias using Gradient Descent
     def fit(self, X, y):
         n_samples, n_features = X.shape
         self.weights = np.zeros(n_features)
@@ -360,26 +362,29 @@ class LogisticRegression:
             self.bias -= self.learning_rate * db
             
             if (epoch + 1) % 100 == 0:
+                # Calculate and print the Binary Cross-Entropy Cost function
                 cost = - (1 / n_samples) * np.sum(y * np.log(y_predicted + 1e-9) + (1 - y) * np.log(1 - y_predicted + 1e-9)) # Added 1e-9 for log stability
                 print(f"   Epoch {epoch+1}/{self.max_iterations}, Cost: {cost:.4f}")
         
         print(f"Training complete!")
         print(f"   Final weights: {self.weights}")
         print(f"   Final bias: {self.bias}")
-
+    # Returns the predicted probabilities for the input X
     def predict_proba(self, X):
         linear_model = np.dot(X, self.weights) + self.bias
         return self.sigmoid(linear_model)
-
+    # Returns binary predictions (0 or 1) for the input X
+    # Classifies as 1 if the predicted probability is greater than or equal to the threshold (default 0.5), otherwise 0
     def predict(self, X, threshold=0.5):
         probabilities = self.predict_proba(X)
         return (probabilities >= threshold).astype(int)
-
+    # Calculates the accuracy of the model
+    # Compares predicted labels with actual labels and returns the proportion of correct matches
     def score(self, X, y):
         predictions = self.predict(X)
         accuracy = np.mean(predictions == y)
         return accuracy
-
+# main fuction: Defines the overall execution flow of the logistic regression model
 def main():
     print("Iris Dataset Logistic Regression for Setosa vs. Others")
     print("-" * 50)
@@ -396,16 +401,13 @@ def main():
     y = (df['species'] == 'Iris-setosa').astype(int).values
     
     feature_names = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
-
+    # Creates and instance of the LogisticRegression model
     model = LogisticRegression(learning_rate=0.1, max_iterations=1000) # Adjusted learning rate for potentially faster convergence
-
-    # Split data
+    # Splits the data into training (80%) and testing (20%) sets
     X_train, X_test, y_train, y_test = model.train_test_split(X, y, test_size=0.2, random_state=42)
-    
-    # Train model
+    # Trains the model using the training data
     model.fit(X_train, y_train)
-    
-    # Evaluate model
+    # Evaluates and prints the model's accuracy on the test data
     accuracy = model.score(X_test, y_test)
     print(f"\nModel Performance Evaluation:")
     print(f"   Accuracy: {accuracy:.4f} (Correctly predicted {int(accuracy * len(y_test))} out of {len(y_test)} samples)")
@@ -434,22 +436,23 @@ if __name__ == "__main__":
     main()
 ```
 #### 로지스틱 회귀 (One-vs-All, OvA for Multiclass): 다중 클래스 분류 문제를 해결하기 위해 이진 분류기를 여러 개 사용하는 OvA 방식의 로지스틱 회귀 모델입니다.
-```
+```C++
 mport numpy as np
 import pandas as pd
 
 class LogisticRegressionOvA:
+    # Initializes learning rate, number of iterations, an empty list for models, and stores the provided class names
     def __init__(self, class_names, learning_rate=0.1, n_iterations=2000):
         self.learning_rate = learning_rate
         self.n_iterations = n_iterations
         self.models = []
         self.class_names_ = class_names
         self.unique_classes_ = None
-
+    # Sigmoid function
     def _sigmoid(self, z):
         z_clipped = np.clip(z, -500, 500)
         return 1 / (1 + np.exp(-z_clipped))
-
+    # Shuffles the data and divides it based on the specified test_size
     def train_test_split(self, X, y, test_size=0.2, random_state=42):
         np.random.seed(random_state)
         n_samples = len(X)
@@ -465,7 +468,8 @@ class LogisticRegressionOvA:
         y_test = y[test_indices]
         
         return X_train, X_test, y_train, y_test
-
+    # Trains a single binary logistic regression classifier for a specific class (One-vs-All approach)
+    # Performs gradient descent to find the optimal weights and bias for distinguishing 'class_value' from all other classes
     def _train_binary_classifier(self, X_train_ova, y_train_ova_binary, class_value):
         n_samples, n_features = X_train_ova.shape
         weights = np.zeros(n_features)
@@ -474,18 +478,18 @@ class LogisticRegressionOvA:
         for _ in range(self.n_iterations):
             linear_model = np.dot(X_train_ova, weights) + bias
             y_predicted_proba = self._sigmoid(linear_model)
-
+            # Calculate gradients(derivatives of the cost function) for weights and bias
             dw = (1 / n_samples) * np.dot(X_train_ova.T, (y_predicted_proba - y_train_ova_binary))
             db = (1 / n_samples) * np.sum(y_predicted_proba - y_train_ova_binary)
-
+            # Update weights and bias using the learning rate and gradients
             weights -= self.learning_rate * dw
             bias -= self.learning_rate * db
-        
+        # Return the trained weights, bias, and the class value this model was trained for
         return {'weights': weights, 'bias': bias, 'class_value': class_value}
-
+    # Fits the One-vs-All logistic regression model by training a separate binary classifier for each unique class present in the training labels
     def fit(self, X_train, y_train):
-        self.unique_classes_ = np.unique(y_train)
-        self.models = []
+        self.unique_classes_ = np.unique(y_train) # Identify all unique classes in the target variable
+        self.models = [] # Reset the list of models
 
         print("\n--- Individual OvA Classifier Training Info ---")
         for class_value in self.unique_classes_:
@@ -493,78 +497,78 @@ class LogisticRegressionOvA:
             current_class_name = self.class_names_[class_value_int]
             
             y_train_ova_binary = np.where(y_train == class_value, 1, 0)
-            
+            # Train a binary classifier for the current class
             model_info = self._train_binary_classifier(X_train, y_train_ova_binary, class_value)
             self.models.append(model_info)
-
+ 
             print(f"\n--- Classifier: {current_class_name} vs. Others ---")
             print(f"Weights: {model_info['weights']}")
             print(f"Bias: {model_info['bias']:.4f}")
-
+            # Calculate and print the training accuracy for this specific binary classifier
             predictions_binary_train = (self._sigmoid(np.dot(X_train, model_info['weights']) + model_info['bias']) >= 0.5).astype(int)
             accuracy_binary_train = self.accuracy(y_train_ova_binary, predictions_binary_train)
             print(f"Training Accuracy (Binary '{current_class_name} vs Others'): {accuracy_binary_train:.4f}")
-
+    # Predicts the probabilityof each input sample belonging to each class
     def predict_proba(self, X):
         probas_list = []
         for model_info in self.models:
             linear_model = np.dot(X, model_info['weights']) + model_info['bias']
             probas = self._sigmoid(linear_model)
             probas_list.append(probas)
-        return np.array(probas_list).T
-
+        return np.array(probas_list).T # Transpose to have samples as rows and classes as columns
+    # Predicts the class label for each input sample
     def predict(self, X):
         probabilities = self.predict_proba(X)
         argmax_indices = np.argmax(probabilities, axis=1)
         return self.unique_classes_[argmax_indices]
-
+    # Calcuates the accuracy score by  comparing true labels with predicted labels
     def accuracy(self, y_true, y_pred):
         return np.sum(y_true == y_pred) / len(y_true)
-
+# Main function to execute the Logistic Regression OvA classification process 
 def main():
-    np.random.seed(42)
+    np.random.seed(42) # Set random seed for reproducibility
 
     csv_file_path = 'iris_150.csv'
     
-    iris_dataframe = pd.read_csv(csv_file_path)
-
+    iris_dataframe = pd.read_csv(csv_file_path) # Load the dataset
+    # Define class names and create mappings between names and numerical labels
     species_names_list = ['setosa', 'versicolor', 'virginica']
     species_name_to_label_map = {name: i for i, name in enumerate(species_names_list)}
     label_to_species_name_map = {i: name for i, name in enumerate(species_names_list)}
-    
+    # Convert species names to numerical labels in the dataframe
     iris_dataframe['species_numerical'] = iris_dataframe['species'].map(species_name_to_label_map)
 
     class_names_list_for_model = species_names_list
-
+    # Extract feature(X) and target (y) as numpy arrays
     original_features = iris_dataframe[['sepal_length', 'sepal_width', 'petal_length', 'petal_width']].values
     original_target_numerical = iris_dataframe['species_numerical'].values
-    
+    # Suffle the dataset(features and target together)
     permutation_indices = np.random.permutation(len(original_features))
     shuffled_features = original_features[permutation_indices]
     shuffled_target_numerical = original_target_numerical[permutation_indices]
-
+    # Create a shuffled DataFrame for display purposes
     shuffled_df_for_display = iris_dataframe.iloc[permutation_indices].reset_index(drop=True)
     
     print("--- Shuffled Dataset (first 5 samples from CSV) ---")
     print(shuffled_df_for_display[['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'species']].head())
     print("-" * 70)
-
+    # Initialize the Logistic Regression OvA classifier with specified parameters
     ova_classifier = LogisticRegressionOvA(
         class_names=class_names_list_for_model,
         learning_rate=0.1, 
         n_iterations=3000 
     )
-
+    # Split the shuffled data into training and testing sets
     X_train, X_test, y_train, y_test = ova_classifier.train_test_split(
         shuffled_features, shuffled_target_numerical, test_size=0.2, random_state=42
     )
     print(f"\nTraining data size: X_train {X_train.shape}, y_train {y_train.shape}")
     print(f"Test data size: X_test {X_test.shape}, y_test {y_test.shape}")
-
+    # Train the One-vs-All classifier
     ova_classifier.fit(X_train, y_train)
-
+    # Make predictions on the test set
     test_set_predictions_idx = ova_classifier.predict(X_test)
-
+    # Print detailed prediction results for the first 10 sampled of the test set
     print("\n\n--- Test Set Prediction Results (first 10 samples) ---")
     print(f"{'Actual Species':<20} | {'Predicted Species':<20} | {'Correct?':<10}")
     print("-" * 60) 
@@ -573,7 +577,7 @@ def main():
         pred_species_name = label_to_species_name_map[test_set_predictions_idx[i]] 
         is_correct = "Yes" if y_test[i] == test_set_predictions_idx[i] else "No"
         print(f"{true_species_name:<20} | {pred_species_name:<20} | {is_correct:<10}")
-
+    # Calculate and print the overall accuracy on the test set
     overall_test_accuracy = ova_classifier.accuracy(y_test, test_set_predictions_idx)
     num_correct_total = np.sum(y_test == test_set_predictions_idx)
     num_total_test = len(y_test)
@@ -585,7 +589,7 @@ if __name__ == "__main__":
 ```
 
 #### 결정 트리 (Decision Tree): 데이터의 특징을 기반으로 트리 구조의 분류/회귀 모델을 만듭니다.
-```
+```C++
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
