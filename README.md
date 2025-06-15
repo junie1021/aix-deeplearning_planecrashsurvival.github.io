@@ -437,7 +437,7 @@ if __name__ == "__main__":
 ```
 #### 로지스틱 회귀 (One-vs-All, OvA for Multiclass): 다중 클래스 분류 문제를 해결하기 위해 이진 분류기를 여러 개 사용하는 OvA 방식의 로지스틱 회귀 모델입니다.
 ```C++
-mport numpy as np
+import numpy as np
 import pandas as pd
 
 class LogisticRegressionOvA:
