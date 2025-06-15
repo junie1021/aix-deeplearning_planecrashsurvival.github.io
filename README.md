@@ -44,6 +44,19 @@ scikit-learn
 
 pip install -r requirements.txt
 ```
+### 스크립트 실행
+```
+python3 SimpleLinear.py
+python3 MultipleLinear.py
+python3 LogisticRegression.py
+python3 LogisticRegression_Ova.py
+python3 DecisionTree.py
+python3 KNN_Classifier.py
+```
+### 가상 환경 비활성화
+```
+deactivate
+```
 
 
 # IV. Evaluation & Analysis
