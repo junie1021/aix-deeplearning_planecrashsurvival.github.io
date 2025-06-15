@@ -961,13 +961,31 @@ if __name__ == "__main__":
   
 #### 다중 선형 회귀 (Multiple Linear Regression)
 
+![image](https://github.com/user-attachments/assets/a037867c-7b29-458e-aa03-5890bdfe1a04)
 
 
 #### 로지스틱 회귀 (Binary Logistic Regression)
 
+![image](https://github.com/user-attachments/assets/25f48eb8-b2d8-4ea7-af5b-aa7bade66d5b)
+![image](https://github.com/user-attachments/assets/6e2f4b10-3974-4b73-ba2d-7cc263069082)
+
+
 #### 로지스틱 회귀 (One-vs-All, OvA for Multiclass)
+
+![image](https://github.com/user-attachments/assets/5ae9853c-d416-457a-a296-64fad56ffd70)
+![image](https://github.com/user-attachments/assets/6d0b7dcd-194f-446d-afa9-ef5e3b2c801d)
 
 #### 결정 트리 (Decision Tree)
 
+![image](https://github.com/user-attachments/assets/1629f3ab-bc05-4050-bb83-4622e27f797f)
+![image](https://github.com/user-attachments/assets/e6073309-5345-4eab-a11d-e6dc0c202787)
+
+
 #### K-최근접 이웃 (K-Nearest Neighbors, K-NN)
+
+![image](https://github.com/user-attachments/assets/574fd70c-9572-4443-8061-c1049bafb6a7)
+![image](https://github.com/user-attachments/assets/e1a747ea-03b8-45e4-82e0-71fa0921e065)
+
+
+
 # V. Conclusion: Discussion
