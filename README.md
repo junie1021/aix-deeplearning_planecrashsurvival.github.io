@@ -25,7 +25,7 @@ https://www.kaggle.com/datasets/khsamaha/aviation-accident-database-synopses
 데이터셋은 Kaggle의 Aviation Accident Database & Synopses, up to 2023 를 이용하였습니다. 이 데이터셋은 1962년부터 현재까지의 민간 항공 사고와 미국, 미국 영토 및 속령, 국제 해역에서 발생한 특정 사건들에 대한 정보를 담고 있습니다.
 
 
-iris_150.csv 는 로지스틱 회귀모델(이진), 로지스틱 회귀모델(OvA), 결정트리모델, K-NN 모델을 실험할 때 사용하였고, house_prices_100.csv 는 다중선형회귀모델, 단순선형회귀모델을 실험할 때 사용하였습니다. 
+[iris_150.csv] 는 로지스틱 회귀모델(이진), 로지스틱 회귀모델(OvA), 결정트리모델, K-NN 모델을 실험할 때 사용하였고, [house_prices_100.csv] 는 다중선형회귀모델, 단순선형회귀모델을 실험할 때 사용하였습니다. 
 # III. Methodology
 # IV. Evaluation & Analysis
 # V. Conclusion: Discussion
