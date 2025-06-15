@@ -1122,7 +1122,7 @@ K=3, 5 등 여러 값으로 실험 가능, 결정 경계는 복잡할 수 있습
 
 ### RandomForest 모델 실행결과 분석
 
-![image](https://github.com/user-attachments/assets/9fd0030b-2a984ed0-a794-9aa1a4ca8eee)
+![스크린샷 2025-06-15 222811](https://github.com/user-attachments/assets/aa75114a-51d6-4ca2-bd26-0a6a11982686)
 
 
 - 데이터 로딩
