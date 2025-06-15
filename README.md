@@ -956,43 +956,9 @@ if __name__ == "__main__":
 - 각 모델별 실행결과입니다.
 #### 단순 선형 회귀 (Simple Linear Regression)
 
-Simple Linear Regression using house price prediction
-   size_sqm  bedrooms  age_years  distance_to_city_km  price_million_won
-0        25         1          2                    5                180
-1        35         1          8                   12                165
-2        45         2          1                    7                235
-3        55         2          5                   15                220
-4        65         2         12                    8                285
-Weights: 3.0243563333432992, Bias: 59.6167650528983
-Equation: y = 3.0243563333432992x + 59.6167650528983
-R2 Score by size_sqm: 0.965169518847209
-Weights: 3.0151786491561885, Bias: 364.399258789439
-Equation: y = 3.0151786491561885x + 364.399258789439
-R2 Score by distance_to_city_km: 0.011888650613998464
-Weights: 77.22563424593348, Bias: 79.89030390253691
-Equation: y = 77.22563424593348x + 79.89030390253691
-R2 Score by bedrooms: 0.9659508756538263
-Weights: -1.8553500432152108, Bias: 425.88847018150386
-Equation: y = -1.8553500432152108x + 425.88847018150386
-R2 Score by age_years: 0.002698830685032849
+![image](https://github.com/user-attachments/assets/3120c897-c794-4e65-98f5-34e5ab0d26ff)
 
-=== Proper Evaluation with Train/Test Split ===
-Weights: 3.0975919673824808, Bias: 50.96293631466318
-Equation: y = 3.0975919673824808x + 50.96293631466318
-size_sqm: Train R2=0.9689, Test R2=0.9409, Overfitting=0.0280
-Weights: 0.4800101372697416, Bias: 406.482992299841
-Equation: y = 0.4800101372697416x + 406.482992299841
-distance_to_city_km: Train R2=0.0003, Test R2=0.0083, Overfitting=-0.0080
-Weights: 77.97655620467366, Bias: 74.69744661563254
-Equation: y = 77.97655620467366x + 74.69744661563254
-bedrooms: Train R2=0.9695, Test R2=0.9451, Overfitting=0.0244
-Weights: -6.024448912184965, Bias: 462.9073023623178
-Equation: y = -6.024448912184965x + 462.9073023623178
-age_years: Train R2=0.0244, Test R2=-0.2118, Overfitting=0.2362
-
-Best feature (by test R2): bedrooms with Test R2 Score of 0.9451
-Data size: 111 samples (was 20, now 100)
-
+  
 #### 다중 선형 회귀 (Multiple Linear Regression)
 
 
