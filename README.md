@@ -27,10 +27,12 @@ https://www.kaggle.com/datasets/khsamaha/aviation-accident-database-synopses
 
 iris_150.csv 는 로지스틱 회귀모델(이진), 로지스틱 회귀모델(OvA), 결정트리모델, K-NN 모델을 실험할 때 사용하였고, house_prices_100.csv 는 다중선형회귀모델, 단순선형회귀모델을 실험할 때 사용하였습니다. 
 # III. Methodology
+### 가상 환경 생성 및 활성화
+``` python3 -m venv venv
+source venv/bin/activate
+```
 ### 필요 라이브러리 설치
-
-
-requirements.txt:
+``` requirements.txt:
 
 pandas
 numpy
@@ -38,7 +40,7 @@ matplotlib
 scikit-learn
 
 pip install -r requirements.txt
-
+```
 
 # IV. Evaluation & Analysis
 # V. Conclusion: Discussion
