@@ -1120,6 +1120,248 @@ K=3, 5 등 여러 값으로 실험 가능, 결정 경계는 복잡할 수 있습
 
 여러 개의 결정 트리로 구성된 Random Forest 모델은 각 트리의 예측을 결합하여 최종 예측을 수행합니다. 분류 문제의 경우, 각 트리의 예측 중 가장 많이 나온 클래스를 선택하여 최종 클래스를 결정합니다(다수결 투표). 회귀 문제의 경우, 각 트리의 예측값을 평균하여 최종 예측값을 결정합니다.
 
+### RandomForest 모델 코드의 주요부분 정리
+```C++
+class AviationSurvivalPredictor:
+    
+    def __init__(self):
+        self.aviation_data = None
+        self.state_codes = None
+        self.model = None
+        self.label_encoders = {}
+        self.feature_columns = []
+        self.target_column = 'survival_rate'
+        
+    def load_data(self):
+        try:
+            self.aviation_data = pd.read_csv('AviationData.csv', encoding='cp1252', low_memory=False)
+            self.state_codes = pd.read_csv('USState_Codes.csv')
+            print(f"  
+Available Columns ({len(self.aviation_data.columns)}):")
+            for i, col in enumerate(self.aviation_data.columns, 1):
+                print(f"  {i:2d}. {col}")
+            return True
+        except FileNotFoundError as e:
+            print(f"Error loading data: {e}")
+            return False
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            return False
+    
+    def explore_data(self):
+        print(f"  
+Dataset Overview:")
+        print(f"  Total accidents: {len(self.aviation_data):,}")
+        print(f"  Date range: {self.aviation_data['Event.Date'].min()} to {self.aviation_data['Event.Date'].max()}")
+        print(f"  Memory usage: {self.aviation_data.memory_usage(deep=True).sum() / 1024**2:.1f} MB")
+        
+        survival_cols = ['Total.Fatal.Injuries', 'Total.Serious.Injuries', 
+                        'Total.Minor.Injuries', 'Total.Uninjured']
+        
+        for col in survival_cols:
+            if col in self.aviation_data.columns:
+                non_null = self.aviation_data[col].notna().sum()
+                total = len(self.aviation_data)
+                print(f"  {col}: {non_null:,}/{total:,} ({non_null/total*100:.1f}%) non-null")
+                
+        print(f"  
+Missing Values (Top 10):")
+        missing_pct = (self.aviation_data.isnull().sum() / len(self.aviation_data) * 100).sort_values(ascending=False)
+        for col, pct in missing_pct.head(10).items():
+            print(f"  {col}: {pct:.1f}%")
+        
+        categorical_cols = ['Injury.Severity', 'Aircraft.Category', 'Weather.Condition', 
+                           'Broad.phase.of.flight', 'Engine.Type']
+        
+        for col in categorical_cols:
+            if col in self.aviation_data.columns:
+                unique_count = self.aviation_data[col].nunique()
+                print(f"  {col}: {unique_count} unique values")
+    
+    def create_survival_rate_target(self):
+        fatal_col = 'Total.Fatal.Injuries'
+        serious_col = 'Total.Serious.Injuries'
+        minor_col = 'Total.Minor.Injuries'
+        uninjured_col = 'Total.Uninjured'
+        
+        try:
+            fatal = pd.to_numeric(self.aviation_data[fatal_col], errors='coerce').fillna(0)
+            serious = pd.to_numeric(self.aviation_data[serious_col], errors='coerce').fillna(0)
+            minor = pd.to_numeric(self.aviation_data[minor_col], errors='coerce').fillna(0)
+            uninjured = pd.to_numeric(self.aviation_data[uninjured_col], errors='coerce').fillna(0)
+            
+            total_aboard = fatal + serious + minor + uninjured
+            survivors = serious + minor + uninjured
+            
+            survival_rate = np.where(total_aboard > 0, (survivors / total_aboard * 100), np.nan)
+            survival_rate = np.clip(survival_rate, 0, 100)
+            
+            self.aviation_data['total_aboard'] = total_aboard
+            self.aviation_data['survivors'] = survivors
+            self.aviation_data['survival_rate'] = survival_rate
+            
+            valid_cases = (total_aboard > 0) & (~np.isnan(survival_rate))
+            valid_data = self.aviation_data[valid_cases].copy()
+            
+            self.aviation_data = valid_data
+            return True
+            
+        except Exception as e:
+            print(f"Error creating survival rate: {e}")
+            return False
+    
+    def prepare_features(self):
+        potential_features = {
+            'categorical': [
+                'Injury.Severity',
+                'Aircraft.Category', 
+                'Weather.Condition',
+                'Broad.phase.of.flight',
+                'Engine.Type',
+                'Make',
+                'Amateur.Built',
+                'Schedule',
+                'Purpose.of.flight'
+            ],
+            'numerical': [
+                'Number.of.Engines',
+                'Latitude',
+                'Longitude'
+            ]
+        }
+        
+        selected_features = []
+        
+        for feature in potential_features['categorical']:
+            if feature in self.aviation_data.columns:
+                missing_pct = self.aviation_data[feature].isnull().mean() * 100
+                unique_count = self.aviation_data[feature].nunique()
+                
+                if missing_pct < 70 and unique_count > 1 and unique_count < 1000:
+                    selected_features.append(feature)
+        
+        for feature in potential_features['numerical']:
+            if feature in self.aviation_data.columns:
+                missing_pct = self.aviation_data[feature].isnull().mean() * 100
+                if missing_pct < 70:
+                    numeric_values = pd.to_numeric(self.aviation_data[feature], errors='coerce')
+                    if numeric_values.notna().sum() > len(self.aviation_data) * 0.3:
+                        selected_features.append(feature)
+        
+        self.feature_columns = selected_features
+        return selected_features
+    
+    def preprocess_features(self, features):
+        processed_data = self.aviation_data[features + ['survival_rate']].copy()
+        
+        for feature in features:
+            if self.aviation_data[feature].dtype == 'object':
+                processed_data[feature] = processed_data[feature].fillna('Unknown')
+                
+                le = LabelEncoder()
+                processed_data[feature] = le.fit_transform(processed_data[feature].astype(str))
+                self.label_encoders[feature] = le
+            else:
+                median_value = pd.to_numeric(processed_data[feature], errors='coerce').median()
+                processed_data[feature] = pd.to_numeric(processed_data[feature], errors='coerce').fillna(median_value)
+        
+        processed_data = processed_data.dropna(subset=['survival_rate'])
+        return processed_data
+    
+    def train_random_forest_model(self, features):
+        processed_data = self.preprocess_features(features)
+        
+        X = processed_data[features]
+        y = processed_data['survival_rate']
+        
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42, stratify=np.digitize(y, bins=[0, 25, 50, 75, 100])
+        )
+        
+        self.model = RandomForestRegressor(
+            n_estimators=200,
+            max_depth=15,
+            min_samples_split=10,
+            min_samples_leaf=5,
+            max_features='sqrt',
+            random_state=42,
+            n_jobs=-1,
+            verbose=1
+        )
+        
+        self.model.fit(X_train, y_train)
+        
+        train_pred = self.model.predict(X_train)
+        test_pred = self.model.predict(X_test)
+        
+        test_pred = np.clip(test_pred, 0, 100)
+        train_pred = np.clip(train_pred, 0, 100)
+        
+        train_rmse = np.sqrt(mean_squared_error(y_train, train_pred))
+        test_rmse = np.sqrt(mean_squared_error(y_test, test_pred))
+        train_mae = mean_absolute_error(y_train, train_pred)
+        test_mae = mean_absolute_error(y_test, test_pred)
+        
+        self.analyze_feature_importance(features)
+        
+        self.show_prediction_examples(X_test, y_test, test_pred)
+        
+        return X_test, y_test, test_pred
+    
+    def analyze_feature_importance(self, features):
+        importance_scores = self.model.feature_importances_
+        feature_importance = pd.DataFrame({
+            'feature': features,
+            'importance': importance_scores
+        }).sort_values('importance', ascending=False)
+        
+        plt.figure(figsize=(12, 8))
+        plt.subplot(2, 1, 1)
+        if HAS_SEABORN:
+            sns.barplot(data=feature_importance, x='importance', y='feature', palette='viridis')
+        else:
+            plt.barh(feature_importance['feature'], feature_importance['importance'])
+        plt.title('Random Forest Feature Importance')
+        plt.xlabel('Importance Score')
+        
+        plt.subplot(2, 1, 2)
+        plt.hist(self.aviation_data['survival_rate'], bins=50, alpha=0.7, color='skyblue', edgecolor='black')
+        plt.title('Distribution of Survival Rates')
+        plt.xlabel('Survival Rate (%)')
+        plt.ylabel('Frequency')
+        
+        plt.tight_layout()
+        plt.show()
+    
+    def show_prediction_examples(self, X_test, y_test, y_pred):
+        sample_indices = np.random.choice(len(y_test), min(10, len(y_test)), replace=False)
+        
+        for idx in sample_indices:
+            actual = y_test.iloc[idx]
+            predicted = y_pred[idx]
+            error = abs(actual - predicted)
+    
+    def run_complete_analysis(self):
+        if not self.load_data():
+            return
+        
+        self.explore_data()
+        
+        if not self.create_survival_rate_target():
+            return
+        
+        features = self.prepare_features()
+        if not features:
+            return
+        
+        try:
+            X_test, y_test, y_pred = self.train_random_forest_model(features)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+```
+
+
 ### RandomForest 모델 실행결과 분석
 
 ![스크린샷 2025-06-15 222811](https://github.com/user-attachments/assets/aa75114a-51d6-4ca2-bd26-0a6a11982686)
