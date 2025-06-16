@@ -1,4 +1,5 @@
 ## aix-deeplearning_planecrashsurvival.github.io
+# 동영상 링크: https://youtu.be/jWWBG8fN3Lo?si=2hcAeuBnPcXHxyPk
 # Title: 비행기 사고 생존율 분석
 # Members
 문준영 정보시스템공학과 Liquidangel6922@gmail.com 
